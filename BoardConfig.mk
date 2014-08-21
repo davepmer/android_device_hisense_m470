@@ -61,7 +61,6 @@ BOARD_FLASH_BLOCK_SIZE := 4096
 BOARD_HAL_STATIC_LIBRARIES := \
     libdumpstate.m470 \
     libhealthd
-# Sero 7 Pro does not need libhealth.m470 
 
 # Kernel
 TARGET_PREBUILT_KERNEL := device/hisense/m470/prebuilt/kernel/kernel
@@ -69,11 +68,17 @@ BOARD_KERNEL_CMDLINE := androidboot.selinux=enforce
 TARGET_KERNEL_SOURCE := kernel/hisense/m470
 TARGET_KERNEL_CONFIG := dave_cpu_overclock_m470_defconfig
 # TARGET_KERNEL_CONFIG := dave_m470_defconfig
+# TARGET_KERNEL_CONFIG := dave_cpu_oc_no_cq_m470_defconfig
 # TARGET_KERNEL_CONFIG := dave_no_oc_cq_m470_defconfig
 # TARGET_KERNEL_CONFIG := dave_no_overclock_m470_defconfig
 
 TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
 
+TARGET_USERIMAGES_USE_F2FS := true
+
+TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470
+
+# TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
 
 # Bluetooth
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/hisense/m470/bluetooth
@@ -108,7 +113,6 @@ BOARD_HAVE_PIXEL_FORMAT_INFO := true
 BOARD_HAS_NO_SELECT_BUTTON := true
 TARGET_RECOVERY_UI_LIB := librecovery_ui_m470
 RECOVERY_FSTAB_VERSION := 2
-TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
 BOARD_RECOVERY_SWIPE := true
 
 # Twrp

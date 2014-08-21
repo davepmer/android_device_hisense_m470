@@ -1,7 +1,7 @@
 import init.m470.usb.rc
 
 on early-init
-   write /sys/devices/system/cpu/cpuquiet/current_governor "userspace"
+    write /sys/devices/system/cpu/cpuquiet/current_governor "userspace"
 
 on init
     mkdir /mnt/shell/emulated 0700 shell shell
@@ -108,7 +108,7 @@ on boot
     insmod /system/lib/modules/cfg80211.ko
     insmod /system/lib/modules/bcmdhd.ko
     setprop init.svc.wpa_supplicant "wpa_supplicant"
-#    setprop init.svc.p2p_supplicant "p2p_supplicant" 
+    setprop init.svc.p2p_supplicant "p2p_supplicant" 
 
 # backlight
     chown system system /sys/class/backlight/pwm-backlight/brightness
@@ -187,59 +187,59 @@ on boot
     chown system system /sys/bus/iio/devices/iio:device0/buffer/length
     chown system system /sys/bus/iio/devices/iio:device0/buffer/enable
     chown system system /sys/bus/iio/devices/iio:device0/compass_enable
-chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
-chown system system /sys/bus/iio/devices/iio:device0/dmp_event_int_on
-chown system system /sys/bus/iio/devices/iio:device0/dmp_firmware
-chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
-chown system system /sys/bus/iio/devices/iio:device0/dmp_on
-chown system system /sys/bus/iio/devices/iio:device0/dmp_output_rate
-chown system system /sys/bus/iio/devices/iio:device0/event_display_orientation
-chown system system /sys/bus/iio/devices/iio:device0/firmware_loaded
-chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
-chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
-chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_scale
-chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
-chown system system /sys/bus/iio/devices/iio:device0/key
-chown system system /sys/bus/iio/devices/iio:device0/power_state
-chown system system /sys/bus/iio/devices/iio:device0/quaternion_on
-chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
-chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
-chown system system /sys/bus/iio/devices/iio:device0/self_test
-chown system system /sys/bus/iio/devices/iio:device0/tap_on
-chown system system /sys/bus/iio/devices/iio:device0/temperature
-chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
-chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
-chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
-chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias 
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_offset
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_offset
-chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chown system system /sys/bus/iio/devices/iio:device0/compass_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_event_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_firmware
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_int_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_on
+    chown system system /sys/bus/iio/devices/iio:device0/dmp_output_rate
+    chown system system /sys/bus/iio/devices/iio:device0/event_display_orientation
+    chown system system /sys/bus/iio/devices/iio:device0/firmware_loaded
+    chown system system /sys/bus/iio/devices/iio:device0/gyro_enable
+    chown system system /sys/bus/iio/devices/iio:device0/gyro_matrix
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_scale
+    chown system system /sys/bus/iio/devices/iio:device0/in_magn_scale
+    chown system system /sys/bus/iio/devices/iio:device0/key
+    chown system system /sys/bus/iio/devices/iio:device0/power_state
+    chown system system /sys/bus/iio/devices/iio:device0/quaternion_on
+    chown system system /sys/bus/iio/devices/iio:device0/sampling_frequency
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_accel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_anglvel_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_magn_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_r_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_x_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_y_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_quaternion_z_en
+    chown system system /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+    chown system system /sys/bus/iio/devices/iio:device0/self_test
+    chown system system /sys/bus/iio/devices/iio:device0/tap_on
+    chown system system /sys/bus/iio/devices/iio:device0/temperature
+    chown system system /sys/bus/iio/devices/iio:device0/trigger/current_trigger
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_anglvel_z_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_calibbias
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_calibbias 
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_x_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_y_offset
+    chown system system /sys/bus/iio/devices/iio:device0/in_accel_z_offset
+    chown system system /sys/bus/iio/devices/device0/als_ir_mode
+    chown system system /sys/bus/iio/devices/device0/proximity_enable
 
-chown system system /sys/bus/iio/devices/device0/als_ir_mode
-chown system system /sys/bus/iio/devices/device0/proximity_enable
 # new nodes from linux kernel v3.4
-chown system system /sys/bus/iio/devices/iio:device0/als_ir_mode
-chown system system /sys/bus/iio/devices/iio:device0/proximity_enable
-insmod /system/lib/modules/mpu3050.ko
-insmod /system/lib/modules/inv_mpu_kxtf9.ko
-insmod /system/lib/modules/inv_mpu_ak8975.ko
+    chown system system /sys/bus/iio/devices/iio:device0/als_ir_mode
+    chown system system /sys/bus/iio/devices/iio:device0/proximity_enable
+    insmod /system/lib/modules/mpu3050.ko
+    insmod /system/lib/modules/inv_mpu_kxtf9.ko
+    insmod /system/lib/modules/inv_mpu_ak8975.ko
 
 # BB remote file system
     mkdir /data/rfs
@@ -288,6 +288,9 @@ insmod /system/lib/modules/inv_mpu_ak8975.ko
     chown system system /sys/devices/system/cpu/cpufreq/interactive/go_maxspeed_load
     chown system system /sys/devices/system/cpu/cpufreq/interactive/max_boost
     chown system system /sys/devices/system/cpu/cpufreq/interactive/boost_factor
+
+# Setup CPU for "performance" mode
+    setprop sys.cpu.mode 2
 
 # Increase read ahead size of mmc block devices from default(128) to 4MB
 # Reduces power comsuption during video playback from sdcards
@@ -388,6 +391,17 @@ service btmacwriter /system/bin/btmacwriter
 service wifimacwriter /system/bin/logwrapper /system/bin/wifimacwriter
     class late_start
     oneshot
+
+# Force download of long term orbit data (lto.dat)
+# for Broadcom aGPS
+service gps-lto-dat /system/bin/logwrapper /system/bin/get-gps-lto
+    user root
+    group root
+    disabled
+    oneshot
+
+on property:init.svc.wpa_supplicant=running
+    start gps-lto-dat
 
 #BCM
 service hciattach /system/bin/brcm_patchram_plus -d --enable_hci --tosleep 50000 --baudrate 3000000 --patchram /etc/firmware/bcm4330.hcd --enable_lpm --sco_routing 0,2,1,1,1,0 /dev/ttyHS2

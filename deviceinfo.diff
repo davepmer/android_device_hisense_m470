@@ -1,0 +1,560 @@
+diff -Naur a/packages/apps/Settings/src/com/android/settings/deviceinfo/Memory.java b/packages/apps/Settings/src/com/android/settings/deviceinfo/Memory.java
+--- a/packages/apps/Settings/src/com/android/settings/deviceinfo/Memory.java	2014-07-15 14:37:25.949459000 -0400
++++ b/packages/apps/Settings/src/com/android/settings/deviceinfo/Memory.java	2014-07-13 20:30:59.674870000 -0400
+@@ -177,7 +177,8 @@
+     public void onPrepareOptionsMenu(Menu menu) {
+         final MenuItem usb = menu.findItem(R.id.storage_usb);
+         UserManager um = (UserManager)getActivity().getSystemService(Context.USER_SERVICE);
+-        boolean usbItemVisible = !um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER);
++        boolean usbItemVisible = !isMassStorageEnabled()
++                && !um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER);
+         usb.setVisible(usbItemVisible);
+     }
+ 
+diff -Naur a/packages/apps/Settings/src/com/android/settings/deviceinfo/Status.java b/packages/apps/Settings/src/com/android/settings/deviceinfo/Status.java
+--- a/packages/apps/Settings/src/com/android/settings/deviceinfo/Status.java	2014-07-15 14:37:25.949459000 -0400
++++ b/packages/apps/Settings/src/com/android/settings/deviceinfo/Status.java	2014-07-13 20:30:59.674870000 -0400
+@@ -16,7 +16,6 @@
+ 
+ package com.android.settings.deviceinfo;
+ 
+-import android.app.ActionBar;
+ import android.bluetooth.BluetoothAdapter;
+ import android.content.BroadcastReceiver;
+ import android.content.Context;
+@@ -43,7 +42,6 @@
+ import android.telephony.ServiceState;
+ import android.telephony.TelephonyManager;
+ import android.text.TextUtils;
+-import android.view.MenuItem;
+ 
+ import com.android.internal.telephony.Phone;
+ import com.android.internal.telephony.PhoneConstants;
+@@ -52,8 +50,6 @@
+ import com.android.settings.R;
+ import com.android.settings.Utils;
+ 
+-import org.cyanogenmod.hardware.SerialNumber;
+-
+ import java.lang.ref.WeakReference;
+ 
+ /**
+@@ -215,11 +211,6 @@
+     protected void onCreate(Bundle icicle) {
+         super.onCreate(icicle);
+ 
+-        ActionBar mActionBar = getActionBar();
+-        if (mActionBar != null) {
+-            mActionBar.setDisplayHomeAsUpEnabled(true);
+-        }
+-
+         mHandler = new MyHandler(this);
+ 
+         mTelephonyManager = (TelephonyManager)getSystemService(TELEPHONY_SERVICE);
+@@ -305,7 +296,7 @@
+         setBtStatus();
+         setIpAddressStatus();
+ 
+-        String serial = getSerialNumber();
++        String serial = Build.SERIAL;
+         if (serial != null && !serial.equals("")) {
+             setSummaryText(KEY_SERIAL_NUMBER, serial);
+         } else {
+@@ -314,15 +305,6 @@
+     }
+ 
+     @Override
+-    public boolean onOptionsItemSelected(MenuItem item) {
+-        if (item.getItemId() == android.R.id.home) {
+-            finish();
+-            return true;
+-        }
+-        return false;
+-    }
+-
+-    @Override
+     protected void onResume() {
+         super.onResume();
+ 
+@@ -397,20 +379,6 @@
+              }
+     }
+ 
+-    private String getServiceStateString(int state) {
+-        switch (state) {
+-            case ServiceState.STATE_IN_SERVICE:
+-                return mRes.getString(R.string.radioInfo_service_in);
+-            case ServiceState.STATE_OUT_OF_SERVICE:
+-            case ServiceState.STATE_EMERGENCY_ONLY:
+-                return mRes.getString(R.string.radioInfo_service_out);
+-            case ServiceState.STATE_POWER_OFF:
+-                return mRes.getString(R.string.radioInfo_service_off);
+-            default:
+-                return mRes.getString(R.string.radioInfo_unknown);
+-        }
+-    }
+-
+     private void updateNetworkType() {
+         // Whether EDGE, UMTS, etc...
+         String networktype = null;
+@@ -443,16 +411,24 @@
+     }
+ 
+     private void updateServiceState(ServiceState serviceState) {
+-        int voiceState = serviceState.getState();
+-        int dataState = serviceState.getDataRegState();
++        int state = serviceState.getState();
++        String display = mRes.getString(R.string.radioInfo_unknown);
+ 
+-        if (voiceState == dataState) {
+-            setSummaryText(KEY_SERVICE_STATE, getServiceStateString(voiceState));
+-        } else {
+-            setSummaryText(KEY_SERVICE_STATE, mRes.getString(R.string.phone_service_state,
+-                        getServiceStateString(voiceState), getServiceStateString(dataState)));
++        switch (state) {
++            case ServiceState.STATE_IN_SERVICE:
++                display = mRes.getString(R.string.radioInfo_service_in);
++                break;
++            case ServiceState.STATE_OUT_OF_SERVICE:
++            case ServiceState.STATE_EMERGENCY_ONLY:
++                display = mRes.getString(R.string.radioInfo_service_out);
++                break;
++            case ServiceState.STATE_POWER_OFF:
++                display = mRes.getString(R.string.radioInfo_service_off);
++                break;
+         }
+ 
++        setSummaryText(KEY_SERVICE_STATE, display);
++
+         if (serviceState.getRoaming()) {
+             setSummaryText(KEY_ROAMING_STATE, mRes.getString(R.string.radioInfo_roaming_in));
+         } else {
+@@ -573,16 +549,4 @@
+ 
+         return h + ":" + pad(m) + ":" + pad(s);
+     }
+-
+-    private String getSerialNumber() {
+-        try {
+-            if (SerialNumber.isSupported()) {
+-                return SerialNumber.getSerialNumber();
+-            }
+-        } catch (NoClassDefFoundError e) {
+-            // Hardware abstraction framework not installed; fall through
+-        }
+-
+-        return Build.SERIAL;
+-    }
+ }
+diff -Naur a/packages/apps/Settings/src/com/android/settings/deviceinfo/StorageVolumePreferenceCategory.java b/packages/apps/Settings/src/com/android/settings/deviceinfo/StorageVolumePreferenceCategory.java
+--- a/packages/apps/Settings/src/com/android/settings/deviceinfo/StorageVolumePreferenceCategory.java	2014-07-15 14:37:25.949459000 -0400
++++ b/packages/apps/Settings/src/com/android/settings/deviceinfo/StorageVolumePreferenceCategory.java	2014-07-13 20:30:59.674870000 -0400
+@@ -16,8 +16,6 @@
+ 
+ package com.android.settings.deviceinfo;
+ 
+-import android.app.Activity;
+-import android.app.ActivityManager;
+ import android.app.ActivityManagerNative;
+ import android.app.ActivityThread;
+ import android.app.DownloadManager;
+@@ -27,40 +25,28 @@
+ import android.content.pm.UserInfo;
+ import android.content.res.Resources;
+ import android.hardware.usb.UsbManager;
+-import android.media.MediaScannerConnection;
+-import android.media.MediaScannerConnection.OnScanCompletedListener;
+-import android.net.Uri;
+ import android.os.Environment;
+ import android.os.Handler;
+ import android.os.Message;
+ import android.os.RemoteException;
+ import android.os.UserManager;
+-import android.os.Environment.UserEnvironment;
+ import android.os.storage.StorageManager;
+ import android.os.storage.StorageVolume;
+ import android.preference.Preference;
+ import android.preference.PreferenceCategory;
+ import android.provider.MediaStore;
+ import android.text.format.Formatter;
+-import android.util.Log;
+-import android.widget.Toast;
+ 
+ import com.android.settings.R;
+ import com.android.settings.deviceinfo.StorageMeasurement.MeasurementDetails;
+ import com.android.settings.deviceinfo.StorageMeasurement.MeasurementReceiver;
+-import com.android.settings.deviceinfo.UsageBarPreference.OnRequestMediaRescanListener;
+ import com.google.android.collect.Lists;
+ 
+-import java.io.File;
+ import java.util.HashMap;
+ import java.util.Iterator;
+ import java.util.List;
+ 
+-public class StorageVolumePreferenceCategory extends PreferenceCategory
+-    implements OnRequestMediaRescanListener, OnScanCompletedListener {
+-
+-    public static final String TAG = "StorageVolumePreferenceCategory";
+-
++public class StorageVolumePreferenceCategory extends PreferenceCategory {
+     public static final String KEY_CACHE = "cache";
+ 
+     private static final int ORDER_USAGE_BAR = -2;
+@@ -69,8 +55,6 @@
+     /** Physical volume being measured, or {@code null} for internal. */
+     private final StorageVolume mVolume;
+     private final StorageMeasurement mMeasure;
+-    private final boolean mIsInternal;
+-    private final boolean mIsPrimary;
+ 
+     private final Resources mResources;
+     private final StorageManager mStorageManager;
+@@ -137,8 +121,6 @@
+         super(context);
+ 
+         mVolume = volume;
+-        mIsInternal = mVolume == null;
+-        mIsPrimary = mVolume != null ? mVolume.isPrimary() : false;
+         mMeasure = StorageMeasurement.getInstance(context, volume);
+ 
+         mResources = context.getResources();
+@@ -168,17 +150,8 @@
+         final List<UserInfo> otherUsers = getUsersExcluding(currentUser);
+         final boolean showUsers = mVolume == null && otherUsers.size() > 0;
+ 
+-        boolean allowMediaScan = false;
+-        if ((mIsInternal && Environment.isExternalStorageEmulated()) || mIsPrimary) {
+-            allowMediaScan = true;
+-        } else if (mVolume != null && !mVolume.isRemovable()) {
+-            allowMediaScan = true;
+-        }
+-
+         mUsageBarPreference = new UsageBarPreference(context);
+         mUsageBarPreference.setOrder(ORDER_USAGE_BAR);
+-        mUsageBarPreference.setOnRequestMediaRescanListener(this);
+-        mUsageBarPreference.setAllowMediaScan(allowMediaScan);
+         addPreference(mUsageBarPreference);
+ 
+         mItemTotal = buildItem(R.string.memory_size, 0);
+@@ -224,14 +197,9 @@
+         }
+ 
+         final boolean isRemovable = mVolume != null ? mVolume.isRemovable() : false;
+-        final boolean isUsbStorage = mVolume != null ? (mVolume.getDescription(context).equals(
+-                Resources.getSystem().getString(Resources.getSystem().getIdentifier(
+-                "storage_usb", "string", "android"))) ? true : false) : false;
+-        final boolean isAccessible = mResources.getBoolean(
+-                com.android.internal.R.bool.config_batterySdCardAccessibility);
+         // Always create the preference since many code rely on it existing
+         mMountTogglePreference = new Preference(context);
+-        if (isRemovable && (isUsbStorage || isAccessible)) {
++        if (isRemovable) {
+             mMountTogglePreference.setTitle(R.string.sd_eject);
+             mMountTogglePreference.setSummary(R.string.sd_eject_summary);
+             addPreference(mMountTogglePreference);
+@@ -245,24 +213,19 @@
+             addPreference(mFormatPreference);
+         }
+ 
+-        // The low storage warning is only valid for the internal memory.
+-        // Same condition as for (showDetails) above.
+-        final boolean showLowStorage = mVolume == null || mVolume.isPrimary();
+-        if (showLowStorage)  {
+-            final IPackageManager pm = ActivityThread.getPackageManager();
+-            try {
+-                if (pm.isStorageLow()) {
+-                    mStorageLow = new Preference(context);
+-                    mStorageLow.setOrder(ORDER_STORAGE_LOW);
+-                    mStorageLow.setTitle(R.string.storage_low_title);
+-                    mStorageLow.setSummary(R.string.storage_low_summary);
+-                    addPreference(mStorageLow);
+-                } else if (mStorageLow != null) {
+-                    removePreference(mStorageLow);
+-                    mStorageLow = null;
+-                }
+-            } catch (RemoteException e) {
++        final IPackageManager pm = ActivityThread.getPackageManager();
++        try {
++            if (pm.isStorageLow()) {
++                mStorageLow = new Preference(context);
++                mStorageLow.setOrder(ORDER_STORAGE_LOW);
++                mStorageLow.setTitle(R.string.storage_low_title);
++                mStorageLow.setSummary(R.string.storage_low_summary);
++                addPreference(mStorageLow);
++            } else if (mStorageLow != null) {
++                removePreference(mStorageLow);
++                mStorageLow = null;
+             }
++        } catch (RemoteException e) {
+         }
+     }
+ 
+@@ -289,9 +252,6 @@
+             mMountTogglePreference.setEnabled(true);
+             mMountTogglePreference.setTitle(mResources.getString(R.string.sd_eject));
+             mMountTogglePreference.setSummary(mResources.getString(R.string.sd_eject_summary));
+-            addPreference(mUsageBarPreference);
+-            addPreference(mItemTotal);
+-            addPreference(mItemAvailable);
+         } else {
+             if (Environment.MEDIA_UNMOUNTED.equals(state) || Environment.MEDIA_NOFS.equals(state)
+                     || Environment.MEDIA_UNMOUNTABLE.equals(state)) {
+@@ -323,7 +283,7 @@
+                 mFormatPreference.setSummary(mResources.getString(R.string.mtp_ptp_mode_summary));
+             }
+         } else if (mFormatPreference != null) {
+-            mFormatPreference.setEnabled(mMountTogglePreference.isEnabled());
++            mFormatPreference.setEnabled(true);
+             mFormatPreference.setSummary(mResources.getString(R.string.sd_format_summary));
+         }
+     }
+@@ -517,37 +477,4 @@
+         }
+         return users;
+     }
+-
+-    @Override
+-    public void onRequestMediaRescan() {
+-        final int currentUser = ActivityManager.getCurrentUser();
+-        final UserEnvironment currentEnv = new UserEnvironment(currentUser);
+-
+-        File path = null;
+-        if ((mIsInternal && Environment.isExternalStorageEmulated()) || mIsPrimary) {
+-            path = currentEnv.getExternalStorageDirectory();
+-        } else {
+-            path = mVolume.getPathFile();
+-        }
+-
+-        Log.d(TAG, "Request scan of " + path.getAbsolutePath());
+-        MediaScannerConnection.scanFile(
+-                getContext(), new String[]{path.getAbsolutePath()}, null, this);
+-    }
+-
+-    @Override
+-    public void onScanCompleted(String path, final Uri uri) {
+-        if (uri != null) {
+-            measure();
+-        }
+-        ((Activity)getContext()).runOnUiThread(new Runnable() {
+-            @Override
+-            public void run() {
+-                mUsageBarPreference.notifyScanCompleted();
+-                if (uri != null) {
+-                    Toast.makeText(getContext(), R.string.storage_rescan_media_complete, Toast.LENGTH_SHORT).show();
+-                }
+-            }
+-        });
+-    }
+ }
+diff -Naur a/packages/apps/Settings/src/com/android/settings/deviceinfo/UsageBarPreference.java b/packages/apps/Settings/src/com/android/settings/deviceinfo/UsageBarPreference.java
+--- a/packages/apps/Settings/src/com/android/settings/deviceinfo/UsageBarPreference.java	2014-07-15 14:37:25.949459000 -0400
++++ b/packages/apps/Settings/src/com/android/settings/deviceinfo/UsageBarPreference.java	2014-07-13 20:30:59.674870000 -0400
+@@ -17,13 +17,9 @@
+ package com.android.settings.deviceinfo;
+ 
+ import android.content.Context;
+-import android.os.Handler;
+ import android.preference.Preference;
+ import android.util.AttributeSet;
+ import android.view.View;
+-import android.view.View.OnClickListener;
+-import android.widget.ImageView;
+-import android.widget.ProgressBar;
+ 
+ import com.android.settings.R;
+ import com.google.android.collect.Lists;
+@@ -35,42 +31,23 @@
+  * Creates a percentage bar chart inside a preference.
+  */
+ public class UsageBarPreference extends Preference {
+-
+-    public interface OnRequestMediaRescanListener {
+-        void onRequestMediaRescan();
+-    }
+-
+-    private ImageView mRescanMedia = null;
+-    private ProgressBar mRescanMediaWaiting = null;
+     private PercentageBarChart mChart = null;
+ 
+-    private boolean mAllowMediaScan;
+-
+-    private OnRequestMediaRescanListener mOnRequestMediaRescanListener;
+-
+     private final List<PercentageBarChart.Entry> mEntries = Lists.newArrayList();
+ 
+-    private Handler mHandler;
+-
+     public UsageBarPreference(Context context, AttributeSet attrs, int defStyle) {
+         super(context, attrs, defStyle);
+-        init();
++        setLayoutResource(R.layout.preference_memoryusage);
+     }
+ 
+     public UsageBarPreference(Context context) {
+         super(context);
+-        init();
++        setLayoutResource(R.layout.preference_memoryusage);
+     }
+ 
+     public UsageBarPreference(Context context, AttributeSet attrs) {
+         super(context, attrs);
+-        init();
+-    }
+-
+-    private void init() {
+         setLayoutResource(R.layout.preference_memoryusage);
+-        mHandler = new Handler();
+-        mAllowMediaScan = false;
+     }
+ 
+     public void addEntry(int order, float percentage, int color) {
+@@ -78,49 +55,12 @@
+         Collections.sort(mEntries);
+     }
+ 
+-    protected void setOnRequestMediaRescanListener(OnRequestMediaRescanListener listener) {
+-        mOnRequestMediaRescanListener = listener;
+-    }
+-
+-    protected void setAllowMediaScan(boolean allow) {
+-        mAllowMediaScan = allow;
+-        notifyScanCompleted();
+-    }
+-
+-    protected void notifyScanCompleted() {
+-        if (mRescanMedia != null) {
+-            mRescanMedia.setVisibility(mAllowMediaScan ? View.VISIBLE : View.INVISIBLE);
+-            mRescanMediaWaiting.setVisibility(View.GONE);
+-        }
+-    }
+-
+     @Override
+     protected void onBindView(View view) {
+         super.onBindView(view);
+ 
+         mChart = (PercentageBarChart) view.findViewById(R.id.percentage_bar_chart);
+         mChart.setEntries(mEntries);
+-
+-        mRescanMediaWaiting = (ProgressBar) view.findViewById(R.id.memory_usage_rescan_media_waiting);
+-
+-        mRescanMedia = (ImageView) view.findViewById(R.id.memory_usage_rescan_media);
+-        mRescanMedia.setOnClickListener(new OnClickListener() {
+-            @Override
+-            public void onClick(View v) {
+-                if (mOnRequestMediaRescanListener != null) {
+-                    mRescanMedia.setVisibility(View.GONE);
+-                    mRescanMediaWaiting.setVisibility(View.VISIBLE);
+-                    mHandler.post(new Runnable() {
+-                        @Override
+-                        public void run() {
+-                            mOnRequestMediaRescanListener.onRequestMediaRescan();
+-                        }
+-                    });
+-                }
+-            }
+-        });
+-
+-        notifyScanCompleted();
+     }
+ 
+     public void commit() {
+diff -Naur a/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbSettings.java b/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbSettings.java
+--- a/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbSettings.java	2014-07-15 14:37:25.949459000 -0400
++++ b/packages/apps/Settings/src/com/android/settings/deviceinfo/UsbSettings.java	2014-07-13 20:30:59.674870000 -0400
+@@ -23,8 +23,6 @@
+ import android.hardware.usb.UsbManager;
+ import android.os.Bundle;
+ import android.os.UserManager;
+-import android.os.storage.StorageManager;
+-import android.os.storage.StorageVolume;
+ import android.preference.CheckBoxPreference;
+ import android.preference.Preference;
+ import android.preference.PreferenceScreen;
+@@ -43,14 +41,10 @@
+ 
+     private static final String KEY_MTP = "usb_mtp";
+     private static final String KEY_PTP = "usb_ptp";
+-    private static final String KEY_MASS_STORAGE = "usb_mass_storage";
+ 
+     private UsbManager mUsbManager;
+-    private StorageManager storageManager;
+-    private StorageVolume[] storageVolumes;
+     private CheckBoxPreference mMtp;
+     private CheckBoxPreference mPtp;
+-    private CheckBoxPreference mUms;
+     private boolean mUsbAccessoryMode;
+ 
+     private final BroadcastReceiver mStateReceiver = new BroadcastReceiver() {
+@@ -74,16 +68,11 @@
+ 
+         mMtp = (CheckBoxPreference)root.findPreference(KEY_MTP);
+         mPtp = (CheckBoxPreference)root.findPreference(KEY_PTP);
+-        mUms = (CheckBoxPreference)root.findPreference(KEY_MASS_STORAGE);
+-        if (!storageVolumes[0].allowMassStorage()) {
+-            root.removePreference(mUms);
+-        }
+ 
+         UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+         if (um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER)) {
+             mMtp.setEnabled(false);
+             mPtp.setEnabled(false);
+-            mUms.setEnabled(false);
+         }
+ 
+         return root;
+@@ -93,8 +82,6 @@
+     public void onCreate(Bundle icicle) {
+         super.onCreate(icicle);
+         mUsbManager = (UsbManager)getSystemService(Context.USB_SERVICE);
+-        storageManager = (StorageManager) getSystemService(Context.STORAGE_SERVICE);
+-        storageVolumes = storageManager.getVolumeList();
+     }
+ 
+     @Override
+@@ -117,27 +104,30 @@
+     }
+ 
+     private void updateToggles(String function) {
+-        mMtp.setChecked(UsbManager.USB_FUNCTION_MTP.equals(function));
+-        mPtp.setChecked(UsbManager.USB_FUNCTION_PTP.equals(function));
+-        mUms.setChecked(UsbManager.USB_FUNCTION_MASS_STORAGE.equals(function));
+-
++        if (UsbManager.USB_FUNCTION_MTP.equals(function)) {
++            mMtp.setChecked(true);
++            mPtp.setChecked(false);
++        } else if (UsbManager.USB_FUNCTION_PTP.equals(function)) {
++            mMtp.setChecked(false);
++            mPtp.setChecked(true);
++        } else  {
++            mMtp.setChecked(false);
++            mPtp.setChecked(false);
++        }
+         UserManager um = (UserManager) getActivity().getSystemService(Context.USER_SERVICE);
+         if (um.hasUserRestriction(UserManager.DISALLOW_USB_FILE_TRANSFER)) {
+             Log.e(TAG, "USB is locked down");
+             mMtp.setEnabled(false);
+             mPtp.setEnabled(false);
+-            mUms.setEnabled(false);
+         } else if (!mUsbAccessoryMode) {
+             //Enable MTP and PTP switch while USB is not in Accessory Mode, otherwise disable it
+             Log.e(TAG, "USB Normal Mode");
+             mMtp.setEnabled(true);
+             mPtp.setEnabled(true);
+-            mUms.setEnabled(true);
+         } else {
+             Log.e(TAG, "USB Accessory Mode");
+             mMtp.setEnabled(false);
+             mPtp.setEnabled(false);
+-            mUms.setEnabled(false);
+         }
+     }
+ 
+@@ -161,8 +151,6 @@
+             function = UsbManager.USB_FUNCTION_MTP;
+         } else if (preference == mPtp && mPtp.isChecked()) {
+             function = UsbManager.USB_FUNCTION_PTP;
+-        } else if (preference == mUms && mUms.isChecked()) {
+-            function = UsbManager.USB_FUNCTION_MASS_STORAGE;
+         }
+ 
+         mUsbManager.setCurrentFunction(function, true);
