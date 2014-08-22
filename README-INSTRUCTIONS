@@ -1,13 +1,12 @@
 You do not have to use davepmer's kernel but your kernel must support bck for wifi to work
 
-To build, first copy all .diff to your build root folder 
-then from your build root in a terminal run the following
+first
+start clean ./clean-build.sh
+start build ./start-build.sh
+apply patches ./patch.sh 
+now you need to choose, if you want F2FS or not.  
+if you want F2FS ./F2FS.sh 
 
-patch -p1 < a2dp-fix.diff
-patch -p1 < external-patch.diff
-patch -p1 < fastaudio.diff
-patch -p1 < hardware-patch.diff
-patch -p1 < init-cm11-patch.diff
-
+if F2FS was applied but you want ext4 then ./ext4.sh
 
 

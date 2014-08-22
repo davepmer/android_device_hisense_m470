@@ -76,9 +76,9 @@ TARGET_KERNEL_CUSTOM_TOOLCHAIN := arm-eabi-4.6
 
 TARGET_USERIMAGES_USE_F2FS := true
 
-TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470
+# TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470
 
-# TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
+TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
 
 # Bluetooth
 BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/hisense/m470/bluetooth

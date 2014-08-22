@@ -1,0 +1,108 @@
+diff -Naur a/BoardConfig.mk b/BoardConfig.mk
+--- a/BoardConfig.mk	2014-08-17 18:15:21.233341000 -0400
++++ b/BoardConfig.mk	2014-08-21 20:33:30.993855000 -0400
+@@ -61,7 +61,6 @@
+ BOARD_HAL_STATIC_LIBRARIES := \
+     libdumpstate.m470 \
+     libhealthd
+-# Sero 7 Pro does not need libhealth.m470 
+ 
+ # Kernel
+ TARGET_PREBUILT_KERNEL := device/hisense/m470/prebuilt/kernel/kernel
+@@ -77,9 +76,9 @@
+ 
+ TARGET_USERIMAGES_USE_F2FS := true
+ 
+-TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470
++# TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470
+ 
+-# TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
++TARGET_RECOVERY_FSTAB := device/hisense/m470/prebuilt/ramdisk/fstab.m470
+ 
+ # Bluetooth
+ BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/hisense/m470/bluetooth
+diff -Naur a/device.mk b/device.mk
+--- a/device.mk	2014-08-17 17:44:08.969280000 -0400
++++ b/device.mk	2014-08-21 20:34:31.405855000 -0400
+@@ -57,25 +57,26 @@
+     device/hisense/m470/prebuilt/ramdisk/init.tf.rc:root/init.tf.rc \
+     device/hisense/m470/prebuilt/ramdisk/ueventd.m470.rc:root/ueventd.m470.rc
+ 
+-PRODUCT_COPY_FILES += \
+-    device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470:root/fstab.m470 \
+-    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/twrp.fstab \
+-    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/extra.fstab
+-
+-PRODUCT_PACKAGES += \
+-    f2fstat \
+-    fibmap.f2fs \
+-    fsck.f2fs \
+-    libf2fstat_f2fs \
+-    libfibmap_f2fs \
+-    libfsck_f2fs \
+-    libmake_f2fs \
+-    mkfs.f2fs
+-
+ # PRODUCT_COPY_FILES += \
+-#    device/hisense/m470/prebuilt/ramdisk/fstab.m470:root/fstab.m470 \
+-#    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/twrp.fstab \
+-#    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/extra.fstab
++#    device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470:root/fstab.m470 \
++#    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/twrp.fstab \
++#    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/extra.fstab
++
++# PRODUCT_PACKAGES += \
++#    f2fstat \
++#    fibmap.f2fs \
++#    fsck.f2fs \
++#    libf2fstat_f2fs \
++#    libfibmap_f2fs \
++#    libfsck_f2fs \
++#    libmake_f2fs \
++#    mkfs.f2fs
++
++PRODUCT_COPY_FILES += \
++    device/hisense/m470/prebuilt/ramdisk/fstab.m470:root/fstab.m470 \
++    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/twrp.fstab \
++    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/extra.fstab
++
+ 
+ ifneq ($(TARGET_PREBUILT_WIFI_MODULE),)
+ PRODUCT_COPY_FILES += \
+@@ -105,12 +106,10 @@
+ PRODUCT_PACKAGES += \
+     audio.a2dp.default \
+     audio.r_submix.default \
+-    audio.usb.default \
+     brcm_patchram_plus \
+     bttest \
+     charger \
+     charger_res_images \
+-    CMFileManager \
+     com.android.future.usb.accessory \
+     keystore.m470 \
+     l2ping \
+@@ -175,6 +174,7 @@
+ # etc
+ PRODUCT_COPY_FILES += \
+     device/hisense/m470/prebuilt/etc/audio_policy.conf:system/etc/audio_policy.conf \
++    device/hisense/m470/prebuilt/etc/dbus.conf:system/etc/dbus.conf \
+     device/hisense/m470/prebuilt/etc/enctune.conf:system/etc/enctune.conf \
+     device/hisense/m470/prebuilt/etc/gps.conf:system/etc/gps.conf \
+     device/hisense/m470/prebuilt/etc/libnfc-brcm.conf:system/etc/libnfc-brcm.conf \
+@@ -192,10 +192,11 @@
+ PRODUCT_PACKAGES += \
+     libwpa_client \
+     hostapd \
+-    wpa_supplicant \
+-    wpa_supplicant_overlay.conf \
+-    p2p_supplicant_overlay.conf \
+-    p2p_supplicant.conf
++    wpa_supplicant
++# \
++#    wpa_supplicant_overlay.conf \
++#    p2p_supplicant_overlay.conf \
++#    p2p_supplicant.conf
+ 
+ # NFC
+ PRODUCT_COPY_FILES += \

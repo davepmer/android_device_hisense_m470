@@ -57,25 +57,25 @@ PRODUCT_COPY_FILES += \
     device/hisense/m470/prebuilt/ramdisk/init.tf.rc:root/init.tf.rc \
     device/hisense/m470/prebuilt/ramdisk/ueventd.m470.rc:root/ueventd.m470.rc
 
-PRODUCT_COPY_FILES += \
-    device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470:root/fstab.m470 \
-    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/twrp.fstab \
-    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/extra.fstab
-
-PRODUCT_PACKAGES += \
-    f2fstat \
-    fibmap.f2fs \
-    fsck.f2fs \
-    libf2fstat_f2fs \
-    libfibmap_f2fs \
-    libfsck_f2fs \
-    libmake_f2fs \
-    mkfs.f2fs
-
 # PRODUCT_COPY_FILES += \
-#    device/hisense/m470/prebuilt/ramdisk/fstab.m470:root/fstab.m470 \
-#    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/twrp.fstab \
-#    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/extra.fstab
+#    device/hisense/m470/prebuilt/ramdisk/f2fs/fstab.m470:root/fstab.m470 \
+#    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/twrp.fstab \
+#    device/hisense/m470/prebuilt/ramdisk/f2fs/twrp.fstab:recovery/root/etc/extra.fstab
+
+# PRODUCT_PACKAGES += \
+#    f2fstat \
+#    fibmap.f2fs \
+#    fsck.f2fs \
+#    libf2fstat_f2fs \
+#    libfibmap_f2fs \
+#    libfsck_f2fs \
+#    libmake_f2fs \
+#    mkfs.f2fs
+
+PRODUCT_COPY_FILES += \
+    device/hisense/m470/prebuilt/ramdisk/fstab.m470:root/fstab.m470 \
+    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/twrp.fstab \
+    device/hisense/m470/prebuilt/ramdisk/twrp.fstab:recovery/root/etc/extra.fstab
 
 
 ifneq ($(TARGET_PREBUILT_WIFI_MODULE),)
